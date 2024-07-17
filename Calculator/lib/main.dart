@@ -34,50 +34,67 @@ class _CalculatorHomePageState extends State<CalculatorHomePage> {
   double num1 = 0;
   double num2 = 0;
   String operator = "";
+  bool equalPressed = false;
 
-  buttonPressed(String buttonType) {
-    if (buttonType == "CLEAR") {
+  buttonPressed(String buttonText) {
+    if (buttonText == "CLEAR") {
       _output = "0";
-      output = "0";
       num1 = 0;
       num2 = 0;
       operator = "";
-    } else if (buttonType == "+" || buttonType == "-" || buttonType == "*" || buttonType == "*") {
+    } else if (buttonText == "+" || buttonText == "-" || buttonText == "/" || buttonText == "*") {
       num1 = double.parse(output);
-      operator = buttonType;
+      operator = buttonText;
       _output = "0";
-    } else if (buttonType == ".") {
+      equalPressed = false;
+    } else if (buttonText == ".") {
       if (_output.contains(".")) {
         return;
       } else {
-        _output = _output + buttonType;
+        _output = _output + buttonText;
       }
-    } else if (buttonType == "=") {
+      equalPressed = false;
+    } else if (buttonText == "=") {
       num2 = double.parse(output);
 
       if (operator == "+") {
         _output = (num1 + num2).toString();
-      } else if (operator == "-") {
+      }
+      if (operator == "-") {
         _output = (num1 - num2).toString();
-      } else if (operator == "/") {
-        _output = (num1 / num2).toString();
-      } else if (operator == "*") {
+      }
+      if (operator == "*") {
         _output = (num1 * num2).toString();
+      }
+      if (operator == "/") {
+        _output = (num1 / num2).toString();
       }
 
       num1 = 0;
       num2 = 0;
       operator = "";
+      equalPressed = true;
     } else {
-      _output = _output + buttonType;
+      if (equalPressed) {
+        _output = "0";
+      }
+      _output = _output + buttonText;
+      equalPressed = false;
     }
 
     print(_output);
 
     setState(() {
-      output = double.parse(_output).toStringAsFixed(2);
+      output = _formatString(_output);
     });
+  }
 
+  String _formatString(String output) {
+    double value = double.parse(output);
+    String formatted = value.toStringAsFixed(5);
+    formatted = formatted.replaceAll(RegExp(r'0*$'), ''); // Remove trailing zeros
+    formatted = formatted.replaceAll(RegExp(r'\.$'), ''); // Remove trailing decimal point if any
+    return formatted;
   }
 
   Widget buildButton(String buttonText) {
